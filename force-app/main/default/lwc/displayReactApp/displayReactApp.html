@@ -1,5 +1,6 @@
 <template>
-    <div class="react-container">
-        <iframe src={reactAppUrl} class="react-iframe"></iframe>
+    <div class="container">
+        <iframe src={appUrl} class="app-iframe" onload={handleIframeLoad}></iframe>
     </div>
+    <lightning-button label="Fetch Data" onclick={handleFetchData} class="fetch-button"></lightning-button>
 </template>
