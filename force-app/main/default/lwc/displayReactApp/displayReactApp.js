@@ -11,7 +11,7 @@ export default class DisplayReactApp extends LightningElement {
 
     // Example method to fetch data from server
     handleFetchData() {
-        const url = 'https://your-app.vercel.app/api/data'; // Replace with your API endpoint
+        const url = 'https://mock-reactjs.vercel.app/'; // Replace with your API endpoint
 
         // Fetch data using the Fetch API
         fetch(url, {
