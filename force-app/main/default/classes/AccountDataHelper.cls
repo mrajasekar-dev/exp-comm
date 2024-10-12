@@ -3,14 +3,12 @@ public with sharing class AccountDataHelper {
         AccountDataResponse response = new AccountDataResponse();
         
         try {
-            // Step 1: Query Opportunities related to the Account
             List<Opportunity> opportunities = [
                 SELECT Id, Name, StageName, Probability, CloseDate, Amount, Description, CreatedById, LastModifiedById, OwnerId, Type, LeadSource, ExpectedRevenue
                 FROM Opportunity
                 WHERE AccountId = :accountId
             ];
             
-            // Step 2: Query Quotes related to Opportunities (with nested query)
             Map<Id, List<Quote__c>> oppToQuotes = new Map<Id, List<Quote__c>>();
             List<Quote__c> quotes = [
                 SELECT Id, Name, Status__c, Quote_Number__c, Grand_Total__c, Opportunity__c, Description__c, Discount__c, GST__c, Quote_Valid_From__c, Quote_Valid_Until__c
@@ -25,7 +23,6 @@ public with sharing class AccountDataHelper {
                 oppToQuotes.get(quote.Opportunity__c).add(quote);
             }
 
-            // Step 3: Query Quote Line Items for Quotes (with nested query)
             Map<Id, List<Quote_Line_Item__c>> quoteToLineItems = new Map<Id, List<Quote_Line_Item__c>>();
             List<Quote_Line_Item__c> quoteLineItems = [
                 SELECT Id, Name, Description__c, Quantity__c, Unit_Price__c, Total_Price__c, Product__r.Name, Product__r.Family, Product__r.ProductCode, Quote__c
@@ -40,7 +37,6 @@ public with sharing class AccountDataHelper {
                 quoteToLineItems.get(lineItem.Quote__c).add(lineItem);
             }
 
-            // Step 4: Build the response structure
             for (Opportunity opp : opportunities) {
                 OpportunityResponse oppResponse = new OpportunityResponse();
                 oppResponse.Id = opp.Id;
@@ -96,6 +92,21 @@ public with sharing class AccountDataHelper {
         }
 
         return response;
+    }
+    
+    @AuraEnabled(cacheable=true)
+    public static String getAccountDataForAuraAndLWC(Id accountId) {
+        AccountDataResponse res = getAccountData(accountId);
+        return JSON.serialize(res);
+    }
+
+    @InvocableMethod(label='Get Account Data in JSON for Automation' description='Returns JSON string of account data for a given account ID.')
+    public static List<String> getAccountDataForAutomation(List<Id> accountIds) {
+        Id accountId = accountIds.size() > 0 ? accountIds.get(0) : null;
+        AccountDataResponse res = getAccountData(accountId);
+        List<String> result = new List<String>();
+        result.add(JSON.serialize(res));
+        return result;
     }
 
     public class AccountDataResponse {
