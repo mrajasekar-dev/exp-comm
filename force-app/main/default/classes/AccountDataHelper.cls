@@ -1,5 +1,6 @@
 public with sharing class AccountDataHelper {
-    public static AccountDataResponse getAccountData(Id accountId) {
+    public static AccountDataResponse getAccountData(String accountIdStr) {
+        Id accountId = Id.valueOf(accountIdStr);
         AccountDataResponse response = new AccountDataResponse();
         
         try {
